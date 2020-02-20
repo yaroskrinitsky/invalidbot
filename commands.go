@@ -1,7 +1,6 @@
 package main
 
 import (
-	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -9,18 +8,14 @@ import (
 	"strings"
 )
 
+//Commands type to call bot commands
 type Commands struct {
 	Cache CommandsCache
 }
 
-type CacheProvider interface {
-	Get(key string) (string, bool)
-	Add(key string, val string)
-}
-
-//GetList returns list of participants, including links to profiles/teams
-func(c *Commands) GetList(leagueURL string) (string, error) {
-	if val, hasValue := c.Cache.Get("GetList"+leagueURL); hasValue {
+//GetList returns list of participants as text, including links (sports.ru) to profiles/teams
+func (c *Commands) GetList(leagueURL string) (string, error) {
+	if val, hasValue := c.Cache.Get("GetList" + leagueURL); hasValue {
 		return val, nil
 	}
 	participants, err := GetParticipants(leagueURL)
@@ -40,8 +35,8 @@ func(c *Commands) GetList(leagueURL string) (string, error) {
 	return res, err
 }
 
-//GetTableImg makes a snapshot of the table and returns result as an image
-func(c *Commands) GetTableImg(leagueURL string) (string, error) {
+//GetTableImg takes a snapshot (using phantomjs) of a league table, returns a file name of it to be retrieved as a static file afterwards
+func (c *Commands) GetTableImg(leagueURL string) (string, error) {
 	if val, hasValue := c.Cache.Get("GetTableImg" + leagueURL); hasValue {
 		return val, nil
 	}
@@ -53,11 +48,12 @@ func(c *Commands) GetTableImg(leagueURL string) (string, error) {
 		return "", err
 	}
 
-	c.Cache.Add("GetTableImg" + leagueURL, f)
+	c.Cache.Add("GetTableImg"+leagueURL, f)
 	return f, nil
 }
 
-func(c *Commands) GetSquad(leagueURL string, team string) (string, error){
+//GetSquad takes a snapshot (using phantomjs) of a squad, returns a file name of it to be retrieved as a static file afterwards
+func (c *Commands) GetSquad(leagueURL string, team string) (string, error) {
 	if val, hasValue := c.Cache.Get("GetSquad" + leagueURL + team); hasValue {
 		return val, nil
 	}
@@ -70,7 +66,7 @@ func(c *Commands) GetSquad(leagueURL string, team string) (string, error){
 		}
 	}
 	if p == nil {
-		return "", errors.New(fmt.Sprintf("No such team in the league: %v", team))
+		return "", fmt.Errorf("No such team in the league: %v", team)
 	}
 
 	f := p.Team + ".png"
@@ -80,7 +76,7 @@ func(c *Commands) GetSquad(leagueURL string, team string) (string, error){
 		return "", err
 	}
 
-	c.Cache.Add("GetSquad" + leagueURL + team, f)
+	c.Cache.Add("GetSquad"+leagueURL+team, f)
 
 	return f, err
 }
