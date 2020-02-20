@@ -13,8 +13,8 @@ var (
 
 type Config struct {
 	LeagueURL string `json:"LeagueURL"`
-	BotToken string `json:"BotToken"`
-	Port string `json:"Port"`
+	BotToken  string `json:"BotToken"`
+	Port      string `json:"Port"`
 	PublicURL string `json:"PublicURL"`
 }
 
@@ -32,11 +32,11 @@ func BuildConfigJSON() (Config, error) {
 	return cfg, err
 }
 
-func BuildConfigEnvVars() (Config, error){
+func BuildConfigEnvVars() (Config, error) {
 	cfg := Config{
 		LeagueURL: os.Getenv("LEAGUE_URL"),
-		BotToken: os.Getenv("BOT_TOKEN"),
-		Port: os.Getenv("PORT"),
+		BotToken:  os.Getenv("BOT_TOKEN"),
+		Port:      os.Getenv("PORT"),
 		PublicURL: os.Getenv("PUBLIC_URL"),
 	}
 
