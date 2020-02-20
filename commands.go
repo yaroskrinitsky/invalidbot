@@ -3,15 +3,26 @@ package main
 import (
 	"errors"
 	"fmt"
-	"io"
 	"log"
 	"os"
 	"os/exec"
 	"strings"
 )
 
+type Commands struct {
+	Cache CommandsCache
+}
+
+type CacheProvider interface {
+	Get(key string) (string, bool)
+	Add(key string, val string)
+}
+
 //GetList returns list of participants, including links to profiles/teams
-func GetList(leagueURL string) (string, error) {
+func(c *Commands) GetList(leagueURL string) (string, error) {
+	if val, hasValue := c.Cache.Get("GetList"+leagueURL); hasValue {
+		return val, nil
+	}
 	participants, err := GetParticipants(leagueURL)
 	if err != nil {
 		log.Println(err)
@@ -24,20 +35,32 @@ func GetList(leagueURL string) (string, error) {
 		res += "\n"
 	}
 
+	c.Cache.Add("GetList"+leagueURL, res)
+
 	return res, err
 }
 
 //GetTableImg makes a snapshot of the table and returns result as an image
-func GetTableImg(leagueURL string) (io.Reader, error) {
-	cmd := exec.Command("phantomjs", "snapshot.js", leagueURL, "table.stat-table", "table.png")
+func(c *Commands) GetTableImg(leagueURL string) (string, error) {
+	if val, hasValue := c.Cache.Get("GetTableImg" + leagueURL); hasValue {
+		return val, nil
+	}
+	f := "table.png"
+	cmd := exec.Command("phantomjs", "snapshot.js", leagueURL, "table.stat-table", f)
 	cmd.Run()
-	f, err := os.Open("table.png")
-	defer f.Close()
 
-	return f, err
+	if _, err := os.Stat(f); err != nil {
+		return "", err
+	}
+
+	c.Cache.Add("GetTableImg" + leagueURL, f)
+	return f, nil
 }
 
-func GetSquad(leagueURL string, team string) (string, error){
+func(c *Commands) GetSquad(leagueURL string, team string) (string, error){
+	if val, hasValue := c.Cache.Get("GetSquad" + leagueURL + team); hasValue {
+		return val, nil
+	}
 	participants, err := GetParticipants(leagueURL)
 	var p *Participant
 	for _, pp := range participants {
@@ -56,6 +79,8 @@ func GetSquad(leagueURL string, team string) (string, error){
 	if _, err := os.Stat(f); err != nil {
 		return "", err
 	}
+
+	c.Cache.Add("GetSquad" + leagueURL + team, f)
 
 	return f, err
 }
