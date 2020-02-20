@@ -20,7 +20,7 @@ func GetList(leagueURL string) (string, error) {
 
 	var res string
 	for _, p := range participants {
-		res += fmt.Sprintf(`%v. <a href="%v">%v</a> | <a href="%v">%v</a> | %v | %v | [<a href="/squad %v">SQUAD</a>]`, p.Pos, p.TeamURL, p.Team, p.ProfileURL, p.Name, p.TourPoints, p.TotalPoints, p.Team)
+		res += fmt.Sprintf(`%v. <a href="%v">%v</a> | <a href="%v">%v</a> | %v | %v`, p.Pos, p.TeamURL, p.Team, p.ProfileURL, p.Name, p.TourPoints, p.TotalPoints)
 		res += "\n"
 	}
 
