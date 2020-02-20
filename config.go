@@ -8,9 +8,14 @@ import (
 )
 
 var (
-	CfgBuilders = map[string]ConfigBuilder{"DEV": BuildConfigJSON, "PROD": BuildConfigEnvVars}
+	//CfgBuilders stores references to the config builder functions, for possible environments
+	CfgBuilders = map[string]ConfigBuilder{
+		"DEV":  BuildConfigJSON,
+		"PROD": BuildConfigEnvVars,
+	}
 )
 
+//Config stores global app configuration
 type Config struct {
 	LeagueURL string `json:"LeagueURL"`
 	BotToken  string `json:"BotToken"`
@@ -18,8 +23,10 @@ type Config struct {
 	PublicURL string `json:"PublicURL"`
 }
 
+//ConfigBuilder type to represent config builder functions
 type ConfigBuilder func() (Config, error)
 
+//BuildConfigJSON builds config based on the config.json file
 func BuildConfigJSON() (Config, error) {
 	var cfg Config
 	f, err := ioutil.ReadFile("config.json")
@@ -32,6 +39,7 @@ func BuildConfigJSON() (Config, error) {
 	return cfg, err
 }
 
+//BuildConfigEnvVars builds config retrieving variables from the environment, suitable for hosting platforms
 func BuildConfigEnvVars() (Config, error) {
 	cfg := Config{
 		LeagueURL: os.Getenv("LEAGUE_URL"),
