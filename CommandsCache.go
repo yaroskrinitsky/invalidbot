@@ -2,8 +2,13 @@ package main
 
 import "time"
 
+type CacheProvider interface {
+	Get(key string) (string, bool)
+	Add(key string, val string)
+}
+
 type CacheEntry struct {
-	val string
+	val       string
 	timestamp time.Time
 }
 
@@ -13,7 +18,7 @@ type CommandsCache struct {
 	lifetime time.Duration
 }
 
-func(cc *CommandsCache) Get(key string) (string, bool) {
+func (cc *CommandsCache) Get(key string) (string, bool) {
 	entry := cc.col[key]
 
 	if entry.val != "" && time.Now().Sub(entry.timestamp) <= cc.lifetime*time.Minute {
@@ -23,7 +28,7 @@ func(cc *CommandsCache) Get(key string) (string, bool) {
 	return "", false
 }
 
-func(cc *CommandsCache) Add(key string, val string) {
+func (cc *CommandsCache) Add(key string, val string) {
 	ts := time.Now()
 	cc.col[key] = CacheEntry{
 		val:       val,
