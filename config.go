@@ -17,7 +17,10 @@ var (
 
 //Config stores global app configuration
 type Config struct {
-	LeagueURL string `json:"LeagueURL"`
+	Leagues []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"Leagues"`
 	BotToken  string `json:"BotToken"`
 	Port      string `json:"Port"`
 	PublicURL string `json:"PublicURL"`
@@ -42,13 +45,15 @@ func BuildConfigJSON() (Config, error) {
 //BuildConfigEnvVars builds config retrieving variables from the environment, suitable for hosting platforms
 func BuildConfigEnvVars() (Config, error) {
 	cfg := Config{
-		LeagueURL: os.Getenv("LEAGUE_URL"),
+		//TODO: implement adding leags logic
+		//Leagues:   os.Getenv("LEAGUE_URL"),
 		BotToken:  os.Getenv("BOT_TOKEN"),
 		Port:      os.Getenv("PORT"),
 		PublicURL: os.Getenv("PUBLIC_URL"),
 	}
 
-	if cfg.LeagueURL == "" || cfg.BotToken == "" || cfg.Port == "" || cfg.PublicURL == "" {
+	//TODO: ***if cfg.Leagues == ""*** || cfg.BotToken == "" || cfg.Port == "" || cfg.PublicURL == "" {
+	if cfg.BotToken == "" || cfg.Port == "" || cfg.PublicURL == "" {
 		return cfg, errors.New("config field is empty")
 	}
 

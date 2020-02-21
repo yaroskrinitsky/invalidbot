@@ -1,5 +1,12 @@
 {
-  "LeagueURL": "",
+  "Leagues": [
+    {
+      "name": "", 
+      "url": ""},
+    {
+      "name": "", 
+      "url": ""}
+    ],
   "BotToken": "",
   "Port": "",
   "PublicURL": ""
