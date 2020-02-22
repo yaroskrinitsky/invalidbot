@@ -1,4 +1,4 @@
-package main
+package handle
 
 import (
 	"fmt"
@@ -6,19 +6,28 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"time"
 )
 
-//Commands type to call bot commands
-type Commands struct {
-	Cache CommandsCache
+//League represents a fantasy league
+type League struct {
+	Name string
+	URL  string
 }
 
+var (
+	c = Cache{
+		col:      make(map[string]CacheEntry),
+		lifetime: 30 * time.Minute,
+	}
+)
+
 //GetList returns list of participants as text, including links (sports.ru) to profiles/teams
-func (c *Commands) GetList(leagueURL string) (string, error) {
-	if val, hasValue := c.Cache.Get("GetList" + leagueURL); hasValue {
+func GetList(league League) (string, error) {
+	if val, hasValue := c.Get("GetList" + league.URL); hasValue {
 		return val, nil
 	}
-	participants, err := GetParticipants(leagueURL)
+	participants, err := GetParticipants(league.URL)
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -30,34 +39,34 @@ func (c *Commands) GetList(leagueURL string) (string, error) {
 		res += "\n"
 	}
 
-	c.Cache.Add("GetList"+leagueURL, res)
+	c.Add("GetList"+league.URL, res)
 
 	return res, err
 }
 
 //GetTableImg takes a snapshot (using phantomjs) of a league table, returns a file name of it to be retrieved as a static file afterwards
-func (c *Commands) GetTableImg(leagueURL string) (string, error) {
-	if val, hasValue := c.Cache.Get("GetTableImg" + leagueURL); hasValue {
+func GetTableImg(league League) (string, error) {
+	if val, hasValue := c.Get("GetTableImg" + league.URL); hasValue {
 		return val, nil
 	}
-	f := "table.png"
-	cmd := exec.Command("phantomjs", "snapshot.js", leagueURL, "table.stat-table", f)
+	f := "table_" + league.Name + ".png"
+	cmd := exec.Command("phantomjs", "snapshot.js", league.URL, "table.stat-table", f)
 	cmd.Run()
 
 	if _, err := os.Stat(f); err != nil {
 		return "", err
 	}
 
-	c.Cache.Add("GetTableImg"+leagueURL, f)
+	c.Add("GetTableImg"+league.URL, f)
 	return f, nil
 }
 
 //GetSquad takes a snapshot (using phantomjs) of a squad, returns a file name of it to be retrieved as a static file afterwards
-func (c *Commands) GetSquad(leagueURL string, team string) (string, error) {
-	if val, hasValue := c.Cache.Get("GetSquad" + leagueURL + team); hasValue {
+func GetSquad(league League, team string) (string, error) {
+	if val, hasValue := c.Get("GetSquad" + league.URL + team); hasValue {
 		return val, nil
 	}
-	participants, err := GetParticipants(leagueURL)
+	participants, err := GetParticipants(league.URL)
 	var p *Participant
 	for _, pp := range participants {
 		if strings.Trim(pp.Team, " ") == team {
@@ -69,14 +78,14 @@ func (c *Commands) GetSquad(leagueURL string, team string) (string, error) {
 		return "", fmt.Errorf("No such team in the league: %v", team)
 	}
 
-	f := p.Team + ".png"
+	f := league.Name + "_" + p.Team + ".png"
 	cmd := exec.Command("phantomjs", "snapshot.js", p.TeamURL, "div.grace.full-field", f)
 	cmd.Run()
 	if _, err := os.Stat(f); err != nil {
 		return "", err
 	}
 
-	c.Cache.Add("GetSquad"+leagueURL+team, f)
+	c.Add("GetSquad"+league.URL+team, f)
 
 	return f, err
 }
