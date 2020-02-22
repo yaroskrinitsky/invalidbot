@@ -1,4 +1,4 @@
-package main
+package config
 
 import (
 	"encoding/json"
@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	//CfgBuilders stores references to the config builder functions, for possible environments
-	CfgBuilders = map[string]ConfigBuilder{
+	//Builders stores references to the config builder functions, for possible environments
+	Builders = map[string]Builder{
 		"DEV":  BuildConfigJSON,
 		"PROD": BuildConfigEnvVars,
 	}
@@ -26,8 +26,8 @@ type Config struct {
 	PublicURL string `json:"PublicURL"`
 }
 
-//ConfigBuilder type to represent config builder functions
-type ConfigBuilder func() (Config, error)
+//Builder type to represent config builder functions
+type Builder func() (Config, error)
 
 //BuildConfigJSON builds config based on the config.json file
 func BuildConfigJSON() (Config, error) {
