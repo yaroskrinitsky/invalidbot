@@ -15,7 +15,13 @@ type Cache struct {
 	lifetime time.Duration
 }
 
-//Get ...
+//NewCache creates a new cache object
+func NewCache(duration int) Cache {
+	return Cache{
+		col:      make(map[string]CacheEntry),
+		lifetime: duration * time.Minute,
+	}
+}
 func (c *Cache) Get(key string) (string, bool) {
 	entry := c.col[key]
 
