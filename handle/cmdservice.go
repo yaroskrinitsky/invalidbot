@@ -6,7 +6,6 @@ import (
 	"os"
 	"os/exec"
 	"strings"
-	"time"
 )
 
 //League represents a fantasy league
@@ -16,10 +15,7 @@ type League struct {
 }
 
 var (
-	c = Cache{
-		col:      make(map[string]CacheEntry),
-		lifetime: 30 * time.Minute,
-	}
+	c = NewCache(30)
 )
 
 //GetList returns list of participants as text, including links (sports.ru) to profiles/teams
