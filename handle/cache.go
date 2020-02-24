@@ -2,13 +2,13 @@ package handle
 
 import "time"
 
-//CacheEntry ...
+//CacheEntry represents a unit of data in cache
 type CacheEntry struct {
 	val       string
 	timestamp time.Time
 }
 
-//Cache ...
+//Cache stores execution results for the command service
 type Cache struct {
 	col map[string]CacheEntry
 	//objects lifetime in minutes
@@ -22,6 +22,8 @@ func NewCache(duration int) Cache {
 		lifetime: duration * time.Minute,
 	}
 }
+
+//Get retrieves a cache entry if it exists, otherwise it returns an empty string and false
 func (c *Cache) Get(key string) (string, bool) {
 	entry := c.col[key]
 
@@ -32,7 +34,7 @@ func (c *Cache) Get(key string) (string, bool) {
 	return "", false
 }
 
-//Add ...
+//Add puts a new value to the cache by the provided key
 func (c *Cache) Add(key string, val string) {
 	ts := time.Now()
 	c.col[key] = CacheEntry{
