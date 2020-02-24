@@ -1,0 +1,13 @@
+{
+  "Leagues": [
+    {
+      "name": "Invalid cup 2019", 
+      "url": "https://www.sports.ru/fantasy/football/league/143767.html"},
+    {
+      "name": "Invalid Champions League Qualification", 
+      "url": "https://www.sports.ru/fantasy/football/league/149896.html"}
+    ],
+  "BotToken": "1023081918:AAHl1K2Tr88m5hj_ccTmrPZXg-ypL1_jRpQ",
+  "Port": "8080",
+  "PublicURL": "http://614cda45.ngrok.io"
+}
