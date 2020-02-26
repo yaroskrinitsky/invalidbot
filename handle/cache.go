@@ -1,6 +1,8 @@
 package handle
 
-import "time"
+import (
+	"time"
+)
 
 //CacheEntry represents a unit of data in cache
 type CacheEntry struct {
@@ -26,8 +28,7 @@ func NewCache(duration int) Cache {
 //Get retrieves a cache entry if it exists, otherwise it returns an empty string and false
 func (c *Cache) Get(key string) (string, bool) {
 	entry := c.col[key]
-
-	if entry.val != "" && time.Now().Sub(entry.timestamp) <= c.lifetime*time.Minute {
+	if entry.val != "" && time.Now().Sub(entry.timestamp) <= c.lifetime {
 		return entry.val, true
 	}
 
