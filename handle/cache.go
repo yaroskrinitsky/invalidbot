@@ -19,7 +19,7 @@ type Cache struct {
 func NewCache(duration int) Cache {
 	return Cache{
 		col:      make(map[string]CacheEntry),
-		lifetime: duration * time.Minute,
+		lifetime: time.Duration(duration) * time.Minute,
 	}
 }
 
