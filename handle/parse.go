@@ -1,19 +1,23 @@
-package main
+package handle
 
 import (
-	"golang.org/x/net/html"
 	"net/http"
 	"strings"
+
+	"golang.org/x/net/html"
 )
 
+//Matcher ...
 type Matcher interface {
 	Match(n *html.Node) bool
 }
 
+//ClassSelector ...
 type ClassSelector struct {
 	Class string
 }
 
+//Match ...
 func (s ClassSelector) Match(n *html.Node) bool {
 	if n.Type != html.ElementNode {
 		return false
@@ -28,18 +32,22 @@ func (s ClassSelector) Match(n *html.Node) bool {
 	return false
 }
 
+//TagSelector ...
 type TagSelector struct {
 	Tag string
 }
 
+//Match ...
 func (s TagSelector) Match(n *html.Node) bool {
 	return n.Type == html.ElementNode && s.Tag == n.Data
 }
 
+//CompositeSelector ...
 type CompositeSelector struct {
 	selectors []Matcher
 }
 
+//Match ...
 func (s CompositeSelector) Match(n *html.Node) bool {
 	for _, sel := range s.selectors {
 		if !sel.Match(n) {
@@ -50,6 +58,7 @@ func (s CompositeSelector) Match(n *html.Node) bool {
 	return true
 }
 
+//Where ...
 func (s *CompositeSelector) Where(m Matcher) *CompositeSelector {
 	if s.selectors == nil {
 		s.selectors = make([]Matcher, 0)
@@ -71,7 +80,7 @@ type Participant struct {
 	ProfileURL  string
 }
 
-//GetTable returns the league rankings table
+//GetParticipants returns the league rankings table
 func GetParticipants(url string) ([]Participant, error) {
 	tableNode, err := GetTableNode(url)
 	if err != nil {
@@ -83,6 +92,7 @@ func GetParticipants(url string) ([]Participant, error) {
 	return participants, err
 }
 
+//ParseTable ...
 func ParseTable(table *html.Node) []Participant {
 	tbody := Query(table, TagSelector{Tag: "tbody"})
 	CleanUpTree(tbody)
@@ -95,6 +105,7 @@ func ParseTable(table *html.Node) []Participant {
 	return participants
 }
 
+//ParseRow ...
 func ParseRow(tr *html.Node) Participant {
 	p := Participant{}
 
@@ -118,6 +129,7 @@ func ParseRow(tr *html.Node) Participant {
 	return p
 }
 
+//GetAttributeValue ...
 func GetAttributeValue(n *html.Node, attr string) string {
 	for _, a := range n.Attr {
 		if a.Key == attr {
@@ -128,6 +140,7 @@ func GetAttributeValue(n *html.Node, attr string) string {
 	return ""
 }
 
+//GetTableNode ...
 func GetTableNode(url string) (*html.Node, error) {
 	r, err := http.Get(url)
 	if err != nil {
@@ -145,6 +158,7 @@ func GetTableNode(url string) (*html.Node, error) {
 	return table, nil
 }
 
+//CleanUpTree ...
 func CleanUpTree(n *html.Node) {
 	nodes := make([]*html.Node, 0)
 	var f func(nn *html.Node)
@@ -165,6 +179,7 @@ func CleanUpTree(n *html.Node) {
 	}
 }
 
+//Query ...
 func Query(n *html.Node, m Matcher) *html.Node {
 	for c := n.FirstChild; c != nil; c = c.NextSibling {
 		if m.Match(c) {
