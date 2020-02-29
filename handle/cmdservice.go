@@ -10,20 +10,21 @@ import (
 
 //League represents a fantasy league
 type League struct {
+	ID   string
 	Name string
 	URL  string
 }
 
 var (
-	c = NewCache(30)
+	cache = NewCache(30)
 )
 
 //GetList returns list of participants as text, including links (sports.ru) to profiles/teams
-func GetList(league League) (string, error) {
-	if val, hasValue := c.Get("GetList" + league.URL); hasValue {
+func GetList(leagueURL string) (string, error) {
+	if val, hasValue := cache.Get("GetList" + leagueURL); hasValue {
 		return val, nil
 	}
-	participants, err := GetParticipants(league.URL)
+	participants, err := GetParticipants(leagueURL)
 	if err != nil {
 		log.Println(err)
 		return "", err
@@ -35,34 +36,34 @@ func GetList(league League) (string, error) {
 		res += "\n"
 	}
 
-	c.Add("GetList"+league.URL, res)
+	cache.Add("GetList"+leagueURL, res)
 
 	return res, err
 }
 
 //GetTableImg takes a snapshot (using phantomjs) of a league table, returns a file name of it to be retrieved as a static file afterwards
-func GetTableImg(league League) (string, error) {
-	if val, hasValue := c.Get("GetTableImg" + league.URL); hasValue {
+func GetTableImg(leagueName string, leagueURL string) (string, error) {
+	if val, hasValue := cache.Get("GetTableImg" + leagueURL); hasValue {
 		return val, nil
 	}
-	f := "table_" + league.Name + ".png"
-	cmd := exec.Command("phantomjs", "snapshot.js", league.URL, "table.stat-table", f)
+	f := "table_" + leagueName + ".png"
+	cmd := exec.Command("phantomjs", "snapshot.js", leagueURL, "table.stat-table", f)
 	cmd.Run()
 
 	if _, err := os.Stat(f); err != nil {
 		return "", err
 	}
 
-	c.Add("GetTableImg"+league.URL, f)
+	cache.Add("GetTableImg"+leagueURL, f)
 	return f, nil
 }
 
 //GetSquad takes a snapshot (using phantomjs) of a squad, returns a file name of it to be retrieved as a static file afterwards
-func GetSquad(league League, team string) (string, error) {
-	if val, hasValue := c.Get("GetSquad" + league.URL + team); hasValue {
+func GetSquad(leagueName string, leagueURL string, team string) (string, error) {
+	if val, hasValue := cache.Get("GetSquad" + leagueURL + team); hasValue {
 		return val, nil
 	}
-	participants, err := GetParticipants(league.URL)
+	participants, err := GetParticipants(leagueURL)
 	var p *Participant
 	for _, pp := range participants {
 		if strings.Trim(pp.Team, " ") == team {
@@ -74,14 +75,14 @@ func GetSquad(league League, team string) (string, error) {
 		return "", fmt.Errorf("No such team in the league: %v", team)
 	}
 
-	f := league.Name + "_" + p.Team + ".png"
+	f := leagueName + "_" + p.Team + ".png"
 	cmd := exec.Command("phantomjs", "snapshot.js", p.TeamURL, "div.grace.full-field", f)
 	cmd.Run()
 	if _, err := os.Stat(f); err != nil {
 		return "", err
 	}
 
-	c.Add("GetSquad"+league.URL+team, f)
+	cache.Add("GetSquad"+leagueURL+team, f)
 
 	return f, err
 }
