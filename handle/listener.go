@@ -2,11 +2,12 @@ package handle
 
 import (
 	"encoding/json"
-	"log"
 	"strings"
 
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
+
+var leagues []League
 
 //UpdateHandler ...
 type UpdateHandler func(bot *tgbotapi.BotAPI, u *tgbotapi.Update)
@@ -18,8 +19,9 @@ type UpdateListener struct {
 }
 
 //NewUpdateListener ...
-func NewUpdateListener(bot *tgbotapi.BotAPI) *UpdateListener {
+func NewUpdateListener(bot *tgbotapi.BotAPI, l []League) *UpdateListener {
 	u := &UpdateListener{bot: bot}
+	leagues = l
 	u.handlers = make(map[string]UpdateHandler)
 	u.SetHandler("start", Start)
 	u.SetHandler("stats", Stats)
