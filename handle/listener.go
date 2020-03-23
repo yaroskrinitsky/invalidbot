@@ -59,7 +59,6 @@ func (ul *UpdateListener) Serve(u *tgbotapi.Update) {
 		c = strings.Split(u.Message.Text, " ")[0]
 	}
 
-	log.Println("-----------------------------Serve-----------------------------", c)
 	if h := ul.handlers[c]; h != nil {
 		h(ul.bot, u)
 	}
