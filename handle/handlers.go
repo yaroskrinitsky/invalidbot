@@ -25,7 +25,7 @@ func Stats(bot *tgbotapi.BotAPI, u *tgbotapi.Update) {
 		Cmd string `json:"cmd"`
 		ID  string `json:"id"`
 	}
-	log.Println("-----------Stats---------------")
+
 	json.Unmarshal([]byte(html.UnescapeString(u.CallbackQuery.Data)), &cd)
 
 	var league League
@@ -67,7 +67,7 @@ func Squad(bot *tgbotapi.BotAPI, u *tgbotapi.Update) {
 		Team     string `json:"t"`
 		LeagueID string `json:"l"`
 	}
-	log.Println("-----------Squad---------------")
+
 	json.Unmarshal([]byte(html.UnescapeString(u.CallbackQuery.Data)), &cd)
 	var league League
 	for _, l := range leagues {
