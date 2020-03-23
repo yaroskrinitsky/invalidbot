@@ -21,14 +21,14 @@ type UpdateListener struct {
 func NewUpdateListener(bot *tgbotapi.BotAPI) *UpdateListener {
 	u := &UpdateListener{bot: bot}
 	u.handlers = make(map[string]UpdateHandler)
-	u.Handle("start", Start)
-	u.Handle("stats", Stats)
-	u.Handle("squad", Squad)
+	u.SetHandler("start", Start)
+	u.SetHandler("stats", Stats)
+	u.SetHandler("squad", Squad)
 	return u
 }
 
 //Handle ...
-func (ul *UpdateListener) Handle(cmd string, handler UpdateHandler) {
+func (ul *UpdateListener) SetHandler(cmd string, handler UpdateHandler) {
 	ul.handlers[cmd] = handler
 }
 
@@ -44,12 +44,12 @@ func (ul *UpdateListener) ListenAndServe() {
 	}
 
 	for update := range updates {
-		ul.Serve(&update)
+		ul.Handle(&update)
 	}
 }
 
 //Serve takes an update and calls a corresponding handler for it
-func (ul *UpdateListener) Serve(u *tgbotapi.Update) {
+func (ul *UpdateListener) Handle(u *tgbotapi.Update) {
 	var c string
 	if u.CallbackQuery != nil {
 		var callbackData map[string]string
