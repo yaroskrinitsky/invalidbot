@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/yaroskrinitsky/invalidbot/config"
 	"github.com/yaroskrinitsky/invalidbot/handle"
 
@@ -8,31 +10,37 @@ import (
 )
 
 var (
-	//Env ...
-	Env string
-	//Cfg ...
-	Cfg config.Config
+	//env ...
+	env string
+	//cfg ...
+	cfg config.Config
 )
 
 func init() {
-	if Env == "" {
-		Env = "DEV"
-	}
-	var err error
-	if Cfg, err = config.Builders[Env](); err != nil {
-		panic(err)
+	if env == "" {
+		env = "DEV"
 	}
 }
 
 func main() {
-	bot, err := tgbotapi.NewBotAPI(Cfg.BotToken)
+	var err error
+	if cfg, err = config.Builders[env](); err != nil {
+		panic(err)
+	}
+
+	bot, err := tgbotapi.NewBotAPI(cfg.BotToken)
 	if err != nil {
 		panic(err)
 	}
 
 	bot.Debug = true
 
-	handle.NewUpdateListener(bot).ListenAndServe()
+	var leagues []handle.League
+	for i, l := range cfg.Leagues {
+		leagues = append(leagues, handle.League{ID: fmt.Sprint(i), Name: l.Name, URL: l.URL})
+	}
+
+	handle.NewUpdateListener(bot, leagues).ListenAndServe()
 
 	// log.Printf("Authorized on account %s", bot.Self.UserName)
 
