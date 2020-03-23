@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 
 	"github.com/yaroskrinitsky/invalidbot/config"
@@ -10,21 +11,15 @@ import (
 )
 
 var (
-	//env ...
-	env string
 	//cfg ...
 	cfg config.Config
 )
 
-func init() {
-	if env == "" {
-		env = "DEV"
-	}
-}
-
 func main() {
+	env := flag.String("env", "dev", "Current environment")
+	flag.Parse()
 	var err error
-	if cfg, err = config.Builders[env](); err != nil {
+	if cfg, err = config.Builders[*env](); err != nil {
 		panic(err)
 	}
 

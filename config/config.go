@@ -10,8 +10,8 @@ import (
 var (
 	//Builders stores references to the config builder functions, for possible environments
 	Builders = map[string]Builder{
-		"DEV":  BuildConfigJSON,
-		"PROD": BuildConfigEnvVars,
+		"dev":  BuildConfigJSON,
+		"prod": BuildConfigEnvVars,
 	}
 )
 

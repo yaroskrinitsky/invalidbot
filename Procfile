@@ -1,1 +1,1 @@
-web: bin/invalidbot
+web: bin/invalidbot -env=prod
