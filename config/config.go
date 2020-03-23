@@ -45,15 +45,18 @@ func BuildConfigJSON() (Config, error) {
 //BuildConfigEnvVars builds config retrieving variables from the environment, suitable for hosting platforms
 func BuildConfigEnvVars() (Config, error) {
 	cfg := Config{
-		//TODO: implement adding leags logic
-		//Leagues:   os.Getenv("LEAGUE_URL"),
 		BotToken:  os.Getenv("BOT_TOKEN"),
 		Port:      os.Getenv("PORT"),
 		PublicURL: os.Getenv("PUBLIC_URL"),
 	}
+	leagues := os.Getenv("LEAGUES")
+	err := json.Unmarshal([]byte(leagues), &cfg.Leagues)
+	if err != nil {
+		return cfg, err
+	}
 
 	//TODO: ***if cfg.Leagues == ""*** || cfg.BotToken == "" || cfg.Port == "" || cfg.PublicURL == "" {
-	if cfg.BotToken == "" || cfg.Port == "" || cfg.PublicURL == "" {
+	if len(cfg.Leagues) == 0 || cfg.BotToken == "" || cfg.Port == "" || cfg.PublicURL == "" {
 		return cfg, errors.New("config field is empty")
 	}
 
