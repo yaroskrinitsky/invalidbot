@@ -7,12 +7,12 @@ import (
 	tgbotapi "gopkg.in/telegram-bot-api.v4"
 )
 
-var (
-	leagues = []League{
-		League{ID: "1", Name: "Invalid cup 2019", URL: "https://www.sports.ru/fantasy/football/league/143767.html"},
-		League{ID: "2", Name: "Invalid Champions League Qualification", URL: "https://www.sports.ru/fantasy/football/league/149896.html"},
-	}
-)
+// var (
+// 	leagues = []League{
+// 		League{ID: "1", Name: "Invalid cup 2019", URL: "https://www.sports.ru/fantasy/football/league/143767.html"},
+// 		League{ID: "2", Name: "Invalid Champions League Qualification", URL: "https://www.sports.ru/fantasy/football/league/149896.html"},
+// 	}
+// )
 
 //ComposeInitialMenu returns the initial inline keyboard markup containing buttons to choose a league
 func ComposeInitialMenu() tgbotapi.InlineKeyboardMarkup {
